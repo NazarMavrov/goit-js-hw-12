@@ -3,6 +3,8 @@ import { updateGallery } from './js/render-functions.js';
 
 let currentPage = 1;
 let currentSearchTerm = '';
+let totalHits = 0;
+let loadedHits = 0;
 
 document.querySelector('.search-form').addEventListener('submit', function(event) {
   event.preventDefault();
@@ -16,6 +18,7 @@ document.querySelector('.search-form').addEventListener('submit', function(event
   }
 
   currentPage = 1;
+  loadedHits = 0;
   document.querySelector('.gallery').innerHTML = '';
   document.querySelector('.load-more').style.display = 'none';
   searchAndDisplayImages();
@@ -42,11 +45,24 @@ async function searchAndDisplayImages() {
     }
 
     updateGallery(data.hits);
+    loadedHits += data.hits.length;
+    totalHits = data.totalHits;
 
-    if (data.hits.length > 0) {
-      document.querySelector('.load-more').style.display = 'block';
-    } else {
+    const galleryElement = document.querySelector('.gallery');
+    const { height: cardHeight } = galleryElement.firstElementChild.getBoundingClientRect();
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth'
+    });
+
+      if (loadedHits >= totalHits) {
       document.querySelector('.load-more').style.display = 'none';
+      iziToast.info({
+        title: 'Info',
+        message: "We're sorry, but you've reached the end of search results.",
+      });
+    } else {
+      document.querySelector('.load-more').style.display = 'block';
     }
   } catch (error) {
     document.querySelector('.loader').style.display = 'none';
