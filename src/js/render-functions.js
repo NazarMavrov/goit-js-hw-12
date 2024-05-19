@@ -1,6 +1,5 @@
 export function updateGallery(images) {
   const galleryElement = document.querySelector('.gallery');
-  galleryElement.innerHTML = '';
 
   images.forEach(image => {
     const imageHTML = `
